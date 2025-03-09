@@ -1,16 +1,116 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Signup</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h2>Signup</h2>
-    <form method="post">
-        <input type="text" name="username" placeholder="Username" required><br>
-        <input type="password" name="password" placeholder="Password" required><br>
-        <button type="submit">Sign Up</button>
-    </form>
-    <p>Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <i class="fas fa-car fa-2x"></i>
+                <h1>Vehicle Management</h1>
+            </div>
+            <div class="auth-body">
+                <div class="text-center">
+                    <h2 class="system-name">Create Account</h2>
+                    <p class="system-description">Register to access the vehicle management system</p>
+                </div>
+                
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="flash-messages">
+                            {% for category, message in messages %}
+                                <div class="flash-message {{ category }}">
+                                    <span>{{ message }}</span>
+                                    <button type="button" class="close-btn">&times;</button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+                
+                <form method="post" action="{{ url_for('signup') }}" id="signupForm">
+                    <div class="form-group">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" id="username" name="username" class="form-control" placeholder="Choose a username" required minlength="3">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" id="password" name="password" class="form-control" placeholder="Create a password" required minlength="6">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirm_password" class="form-label">Confirm Password</label>
+                        <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Confirm your password" required>
+                    </div>
+                    
+                    <button type="submit" class="btn">
+                        <i class="fas fa-user-plus"></i> Sign Up
+                    </button>
+                </form>
+            </div>
+            <div class="auth-footer">
+                <p>Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Form validation
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('signupForm');
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirm_password');
+            
+            // Close flash messages
+            const closeButtons = document.querySelectorAll('.close-btn');
+            
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const flashMessage = this.parentElement;
+                    flashMessage.style.opacity = '0';
+                    setTimeout(() => {
+                        flashMessage.remove();
+                    }, 300);
+                });
+            });
+            
+            // Auto-close flash messages after 5 seconds
+            setTimeout(() => {
+                const flashMessages = document.querySelectorAll('.flash-message');
+                flashMessages.forEach(message => {
+                    message.style.opacity = '0';
+                    setTimeout(() => {
+                        message.remove();
+                    }, 300);
+                });
+            }, 5000);
+            
+            // Password match validation
+            confirmPassword.addEventListener('input', function() {
+                if (password.value !== confirmPassword.value) {
+                    confirmPassword.setCustomValidity("Passwords don't match");
+                } else {
+                    confirmPassword.setCustomValidity('');
+                }
+            });
+            
+            password.addEventListener('input', function() {
+                if (confirmPassword.value !== '') {
+                    if (password.value !== confirmPassword.value) {
+                        confirmPassword.setCustomValidity("Passwords don't match");
+                    } else {
+                        confirmPassword.setCustomValidity('');
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 </html>
