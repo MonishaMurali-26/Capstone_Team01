@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Maintenance Records - Vehicle Data Management System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2">Maintenance Records</h1>
+        <a href="{{ url_for('add_maintenance') }}" class="btn btn-primary">
+            <i class="fas fa-plus-circle"></i> Add Maintenance Record
+        </a>
+    </div>
+    
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Maintenance History</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="maintenanceTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Vehicle</th>
+                            <th>Service Type</th>
+                            <th>Cost</th>
+                            <th>Added By</th>
+                            <th>Comments</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for maintenance, vehicle, user in maintenance_entries %}
+                            <tr>
+                                <td>{{ maintenance.service_date.strftime('%m/%d/%Y') }}</td>
+                                <td>{{ vehicle.vin }}</td>
+                                <td>{{ maintenance.service_type }}</td>
+                                <td>${{ maintenance.service_cost }}</td>
+                                <td>{{ user.username }}</td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#commentModal{{ maintenance.maintenance_id }}">
+                                        <i class="fas fa-comment"></i> View
+                                    </button>
+                                    
+                                    <!-- Comment Modal -->
+                                    <div class="modal fade" id="commentModal{{ maintenance.maintenance_id }}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Maintenance Comments</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p><strong>Service:</strong> {{ maintenance.service_type }}</p>
+                                                    <p><strong>Date:</strong> {{ maintenance.service_date.strftime('%m/%d/%Y') }}</p>
+                                                    <p><strong>Vehicle:</strong> {{ vehicle.vin }}</p>
+                                                    <hr>
+                                                    <h6>Comments:</h6>
+                                                    <p>{{ maintenance.comments or 'No comments provided.' }}</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize datatable
+        const table = document.getElementById('maintenanceTable');
+        
+        // Add search functionality
+        const searchInput = document.createElement('input');
+        searchInput.type = 'text';
+        searchInput.placeholder = 'Search...';
+        searchInput.classList.add('form-control', 'mb-3');
+        
+        table.parentNode.insertBefore(searchInput, table);
+        
+        searchInput.addEventListener('keyup', function() {
+            const searchText = this.value.toLowerCase();
+            const rows = table.querySelectorAll('tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchText) ? '' : 'none';
+            });
+        });
+    });
+</script>
+{% endblock %}

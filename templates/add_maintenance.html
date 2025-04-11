@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Maintenance Record - Vehicle Data Management System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2">Add Maintenance Record</h1>
+        <a href="{{ url_for('maintenance') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Maintenance Records
+        </a>
+    </div>
+    
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Maintenance Details</h6>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('add_maintenance') }}">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="vehicle_id" class="form-label">Vehicle</label>
+                        <select class="form-select" id="vehicle_id" name="vehicle_id" required>
+                            <option value="" selected disabled>Select Vehicle</option>
+                            {% for vehicle in vehicles %}
+                                <option value="{{ vehicle.vehicle_id }}">
+                                    {{ vehicle.vin }} ({{ vehicle.fuel_type }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label for="service_date" class="form-label">Service Date</label>
+                        <input type="date" class="form-control" id="service_date" name="service_date" value="{{ current_date }}" required>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="service_type" class="form-label">Service Type</label>
+                        <select class="form-select" id="service_type" name="service_type" required>
+                            <option value="" selected disabled>Select Service Type</option>
+                            <option value="Oil Change">Oil Change</option>
+                            <option value="Tire Rotation">Tire Rotation</option>
+                            <option value="Brake Service">Brake Service</option>
+                            <option value="Engine Repair">Engine Repair</option>
+                            <option value="Transmission Service">Transmission Service</option>
+                            <option value="Battery Replacement">Battery Replacement</option>
+                            <option value="Air Filter Replacement">Air Filter Replacement</option>
+                            <option value="Fluid Service">Fluid Service</option>
+                            <option value="Inspection">Inspection</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <div id="other-service-container" class="mt-2 d-none">
+                            <input type="text" class="form-control" id="other_service_type" name="other_service_type" placeholder="Specify service type">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label for="service_cost" class="form-label">Service Cost</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="service_cost" name="service_cost" step="0.01" min="0" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <label for="comments" class="form-label">Comments</label>
+                        <textarea class="form-control" id="comments" name="comments" rows="4" placeholder="Enter details about the maintenance service..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="reset" class="btn btn-outline-secondary">
+                        <i class="fas fa-undo"></i> Reset
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Maintenance Record
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const serviceTypeSelect = document.getElementById('service_type');
+        const otherServiceContainer = document.getElementById('other-service-container');
+        const otherServiceInput = document.getElementById('other_service_type');
+        
+        serviceTypeSelect.addEventListener('change', function() {
+            if (this.value === 'Other') {
+                otherServiceContainer.classList.remove('d-none');
+                otherServiceInput.required = true;
+            } else {
+                otherServiceContainer.classList.add('d-none');
+                otherServiceInput.required = false;
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}Generate Report - Vehicle Data Management System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2">Generate Report</h1>
+        <a href="{{ url_for('reports') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Reports
+        </a>
+    </div>
+    
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Report Parameters</h6>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('generate_report') }}">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="report_type" class="form-label">Report Type</label>
+                        <select class="form-select" id="report_type" name="report_type" required>
+                            <option value="" selected disabled>Select Report Type</option>
+                            <option value="Monthly">Monthly Report</option>
+                            <option value="Annual">Annual Report</option>
+                            <option value="Custom">Custom Date Range</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <label for="start_date" class="form-label">Start Date</label>
+                        <input type="date" class="form-control" id="start_date" name="start_date" required>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <label for="end_date" class="form-label">End Date</label>
+                        <input type="date" class="form-control" id="end_date" name="end_date" required>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info mb-4">
+                    <div class="d-flex">
+                        <div class="me-3">
+                            <i class="fas fa-info-circle fa-2x"></i>
+                        </div>
+                        <div>
+                            <h5 class="alert-heading">Report Information</h5>
+                            <p class="mb-0">The generated report will include:</p>
+                            <ul>
+                                <li>Fuel usage data for all vehicles within the selected date range</li>
+                                <li>Maintenance records within the selected date range</li>
+                                <li>Summary statistics for costs and fuel consumption</li>
+                                <li>The report will be exported as an Excel file (.xlsx)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="reset" class="btn btn-outline-secondary">
+                        <i class="fas fa-undo"></i> Reset
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-file-export"></i> Generate Report
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const reportTypeSelect = document.getElementById('report_type');
+        const startDateInput = document.getElementById('start_date');
+        const endDateInput = document.getElementById('end_date');
+        
+        // Set default dates
+        const today = new Date();
+        const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        
+        endDateInput.value = today.toISOString().split('T')[0];
+        startDateInput.value = firstDayOfMonth.toISOString().split('T')[0];
+        
+        // Update date ranges based on report type
+        reportTypeSelect.addEventListener('change', function() {
+            const reportType = this.value;
+            
+            if (reportType === 'Monthly') {
+                // Set to current month
+                startDateInput.value = firstDayOfMonth.toISOString().split('T')[0];
+                endDateInput.value = lastDayOfMonth.toISOString().split('T')[0];
+            } else if (reportType === 'Annual') {
+                // Set to current year
+                const firstDayOfYear = new Date(today.getFullYear(), 0, 1);
+                const lastDayOfYear = new Date(today.getFullYear(), 11, 31);
+                
+                startDateInput.value = firstDayOfYear.toISOString().split('T')[0];
+                endDateInput.value = lastDayOfYear.toISOString().split('T')[0];
+            } else if (reportType === 'Custom') {
+                // Reset to last 30 days for custom
+                const thirtyDaysAgo = new Date(today);
+                thirtyDaysAgo.setDate(today.getDate() - 30);
+                
+                startDateInput.value = thirtyDaysAgo.toISOString().split('T')[0];
+                endDateInput.value = today.toISOString().split('T')[0];
+            }
+        });
+    });
+</script>
+{% endblock %}

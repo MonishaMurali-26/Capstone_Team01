@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit User - Vehicle Data Management System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2">Edit User</h1>
+        <a href="{{ url_for('users') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Users
+        </a>
+    </div>
+    
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">User Details</h6>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('edit_user', user_id=user.user_id) }}">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="password" class="form-label">New Password (Optional)</label>
+                        <input type="password" class="form-control" id="password" name="password" minlength="6">
+                        <small class="text-muted">Leave blank to keep current password. Minimum 6 characters if changing.</small>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label for="confirm_password" class="form-label">Confirm New Password</label>
+                        <input type="password" class="form-control" id="confirm_password" minlength="6">
+                        <div class="invalid-feedback">Passwords do not match</div>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="role" class="form-label">User Role</label>
+                        <select class="form-select" id="role" name="role" required>
+                            <option value="Admin" {% if user.role == 'Admin' %}selected{% endif %}>Administrator</option>
+                            <option value="User" {% if user.role == 'User' %}selected{% endif %}>Regular User</option>
+                        </select>
+                        <small class="text-muted">
+                            <strong>Administrator:</strong> Full access to all system features.<br>
+                            <strong>Regular User:</strong> Can add fuel and maintenance data, but cannot generate reports or manage users.
+                        </small>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="is_active" name="is_active" {% if user.is_active %}checked{% endif %}>
+                            <label class="form-check-label" for="is_active">
+                                Active Account
+                            </label>
+                            <small class="d-block text-muted">Uncheck to deactivate user account.</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                    <button type="reset" class="btn btn-outline-secondary">
+                        <i class="fas fa-undo"></i> Reset
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <i class="fas fa-save"></i> Update User
+                    </button>
+                </div>

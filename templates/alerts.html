@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}Alerts - Vehicle Data Management System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2">System Alerts</h1>
+    </div>
+    
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">Alert Management</h6>
+            
+            <!-- Status Filter Dropdown -->
+            <div class="dropdown">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="statusFilterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-filter"></i> Filter
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="statusFilterDropdown">
+                    <li><a class="dropdown-item filter-btn" href="javascript:void(0)" data-filter="all">All Alerts</a></li>
+                    <li><a class="dropdown-item filter-btn" href="javascript:void(0)" data-filter="active">Active Alerts</a></li>
+                    <li><a class="dropdown-item filter-btn" href="javascript:void(0)" data-filter="resolved">Resolved Alerts</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item filter-btn" href="javascript:void(0)" data-filter="Fuel Usage">Fuel Usage Alerts</a></li>
+                    <li><a class="dropdown-item filter-btn" href="javascript:void(0)" data-filter="Maintenance Overdue">Maintenance Alerts</a></li>
+                    <li><a class="dropdown-item filter-btn" href="javascript:void(0)" data-filter="Missing Data">Missing Data Alerts</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="card-body">
+            {% if alerts %}
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="alertsTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Vehicle</th>
+                                <th>Alert Type</th>
+                                <th>Message</th>
+                                <th>Created Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for alert in alerts %}
+                                <tr class="alert-row {{ 'active' if not alert.is_resolved else 'resolved' }} {{ alert.alert_type }}">
+                                    <td>{{ alert.vehicle.vin }}</td>
+                                    <td>
+                                        <span class="badge {{ 'bg-warning' if alert.alert_type == 'Fuel Usage' else 'bg-danger' if alert.alert_type == 'Maintenance Overdue' else 'bg-info' }}">
+                                            {{ alert.alert_type }}
+                                        </span>
+                                    </td>
+                                    <td>{{ alert.alert_message }}</td>
+                                    <td>{{ alert.created_at.strftime('%m/%d/%Y %H:%M') }}</td>
+                                    <td>
+                                        <span class="badge {{ 'bg-danger' if not alert.is_resolved else 'bg-success' }}">
+                                            {{ 'Active' if not alert.is_resolved else 'Resolved' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if not alert.is_resolved %}
+                                            <a href="{{ url_for('resolve_alert', alert_id=alert.alert_id) }}" class="btn btn-sm btn-success">
+                                                <i class="fas fa-check"></i> Resolve
+                                            </a>
+                                        {% else %}
+                                            <button class="btn btn-sm btn-outline-secondary" disabled>
+                                                <i class="fas fa-check"></i> Resolved
+                                            </button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
+                    <p>No alerts found in the system.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Filter functionality
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const alertRows = document.querySelectorAll('.alert-row');
+        
+        filterButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const filter = this.getAttribute('data-filter');
+                
+                alertRows.forEach(row => {
+                    if (filter === 'all') {
+                        row.style.display = '';
+                    } else if (filter === 'active' && row.classList.contains('active')) {
+                        row.style.display = '';
+                    } else if (filter === 'resolved' && row.classList.contains('resolved')) {
+                        row.style.display = '';
+                    } else if (row.classList.contains(filter)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+                
+                // Update dropdown button text
+                const filterText = this.textContent;
+                document.getElementById('statusFilterDropdown').innerHTML = '<i class="fas fa-filter"></i> ' + filterText;
+            });
+        });
+        
+        // Set active filter on page load (show all alerts)
+        document.querySelector('[data-filter="all"]').click();
+    });
+</script>
+{% endblock %}

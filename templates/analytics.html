@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}Analytics - Vehicle Data Management System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2">Analytics Dashboard</h1>
+    </div>
+    
+    <div class="row">
+        <!-- Fuel Usage Chart -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Total Fuel Usage by Vehicle</h6>
+                </div>
+                <div class="card-body">
+                    {% if fuel_chart %}
+                        <img src="data:image/png;base64,{{ fuel_chart }}" class="img-fluid" alt="Fuel Usage Chart">
+                    {% else %}
+                        <div class="text-center p-4">
+                            <i class="fas fa-chart-bar fa-4x text-gray-300 mb-3"></i>
+                            <p>No fuel usage data available for chart.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Maintenance Costs Chart -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Total Maintenance Costs by Vehicle</h6>
+                </div>
+                <div class="card-body">
+                    {% if maintenance_chart %}
+                        <img src="data:image/png;base64,{{ maintenance_chart }}" class="img-fluid" alt="Maintenance Costs Chart">
+                    {% else %}
+                        <div class="text-center p-4">
+                            <i class="fas fa-chart-pie fa-4x text-gray-300 mb-3"></i>
+                            <p>No maintenance cost data available for chart.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Fuel Data Table -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Fuel Usage Summary</h6>
+                </div>
+                <div class="card-body">
+                    {% if fuel_data %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Vehicle</th>
+                                        <th>Total Fuel (gallons)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for vehicle, total_fuel in fuel_data %}
+                                        <tr>
+                                            <td>{{ vehicle }}</td>
+                                            <td>{{ total_fuel|round(2) }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-center">No fuel data available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Maintenance Data Table -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Maintenance Cost Summary</h6>
+                </div>
+                <div class="card-body">
+                    {% if maintenance_data %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Vehicle</th>
+                                        <th>Total Cost ($)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for vehicle, total_cost in maintenance_data %}
+                                        <tr>
+                                            <td>{{ vehicle }}</td>
+                                            <td>${{ total_cost|round(2) }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-center">No maintenance data available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
